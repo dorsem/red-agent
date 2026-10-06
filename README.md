@@ -4,6 +4,26 @@
 
 A local Reddit writing agent built with Node.js. It generates posts and comments with Ollama, keeps a draft queue, and can publish through Reddit's API using OAuth.
 
+## Use with Codex or another coding assistant
+
+**Give this repository link to Codex or another coding assistant and ask it to set up and run RED AGENT for you.** With the necessary tools, access, and permissions, the assistant can inspect the project, prepare the local environment, configure the model and writing preferences, run checks, connect your approved Reddit app, and operate the agent within the scope you authorize. You do not have to work through every terminal command yourself.
+
+Copy this request into your assistant:
+
+> Set up and run RED AGENT for me: https://github.com/dorsem/red-agent. Read README.md and AGENTS.md, inspect my environment, and carry out the setup. Configure the model, topics, and writing style with me, run the offline demo, and generate a first draft. If I have approved Reddit access, help me complete OAuth and check the chosen communities before using the connected workflow. Publish or start a limited automatic run only when I have authorized its destinations, actions, and limits. Continue through the steps already covered by my permissions; ask for missing choices, access, or required confirmations. Verify the result and tell me what is running and what still needs my input.
+
+What you provide:
+
+- **Tools and local access:** an assistant that can read the repository, work with files, and run terminal commands. Browser access can help with the sign-in flow when the assistant's environment supports it.
+- **Your choices and permissions:** the model, writing goals, destination communities, and any installation or publishing permissions. You complete sign-in and any confirmations that require your participation.
+- **For Reddit-connected operation:** your own approved app and API access, an eligible account, and permission for automation in the selected communities. Local generation with Ollama works without Reddit access.
+
+[AGENTS.md](AGENTS.md) tells the assistant how to carry the task through setup, validation, and authorized operation. If a required capability or permission is missing, it should finish the available steps and explain the remaining blocker. This is a supported setup workflow, not a guarantee that every assistant environment can complete every step.
+
+Codex can operate the desktop app's built-in browser; Codex CLI and the IDE extension do not include that browser ([OpenAI documentation](https://learn.chatgpt.com/docs/browser)). Browser tools come from your assistant's environment. RED AGENT's implemented Reddit connection uses OAuth and the Data API; it has no browser publishing backend. Current access requirements are explained [below](#can-anyone-connect-their-own-reddit-account).
+
+If you only want a text drafted in the assistant's conversation, say so. That uses the assistant's own model and does not configure or launch RED AGENT's Ollama backend.
+
 Runs on **Node.js 22+ with no external npm dependencies**. You choose the model, editorial profile, publication targets, and limits in a local configuration file. Reddit-connected features require your own approved Reddit app and API access for your use case.
 
 The default is to prepare drafts. Publishing requires an explicit command, and automated runs have a fixed number of cycles. Before sending, the agent checks the account, community rules, limits, and duplicates. If a submission's outcome is unknown, it stops until the result is reconciled.
@@ -56,18 +76,6 @@ node bin/cli.js preview
 `preview` generates a sample post about `topics[0]` and prints the result in the terminal. It calls your configured model server, without connecting to Reddit, creating a queued draft, or publishing anything. You can edit the result and manually post it where permitted.
 
 This is the available writing workflow without Reddit app registration. It does not read Reddit threads or automatically reply to them.
-
-## Use with Codex or another coding assistant
-
-You can give a coding assistant this repository URL and ask it to help with setup or writing. It needs permission to read the repository; running the CLI also needs access to a local checkout and terminal. [AGENTS.md](AGENTS.md) provides the workflow and project constraints.
-
-A starting request:
-
-> Read README.md and AGENTS.md in https://github.com/dorsem/red-agent. Help me prepare one text for review. Ask for my topic and writing preferences if needed. If I want to run the project, inspect it, try the offline demo, and use an already installed Ollama model for preview when available. Otherwise, draft in this conversation and explain that you have not run the CLI model. Do not connect to Reddit or publish anything.
-
-Drafting in the assistant's conversation uses that assistant's model and account. It does not connect the CLI to Codex or replace its Ollama backend.
-
-Browser control depends on the assistant's environment and permissions. For example, Codex can operate the desktop app's built-in browser, while Codex CLI and the IDE extension do not include that browser ([OpenAI documentation](https://learn.chatgpt.com/docs/browser)). RED AGENT itself has no browser automation backend. Giving an assistant the repository does not provide Reddit authorization or start an unattended bot; browser automation is not a fallback after app registration or access has been refused.
 
 ## Can anyone connect their own Reddit account?
 
