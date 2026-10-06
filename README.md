@@ -1,131 +1,171 @@
 # RED AGENT
 
-Локальный CLI-агент для Reddit на Node.js. Генерирует посты и комментарии через Ollama, сохраняет их в очередь черновиков и публикует через Reddit API с OAuth-авторизацией.
+**English** · [Русский](README.ru.md)
 
-Работает на Node.js 22+ без внешних npm-зависимостей. Модель, редакционный профиль, цели публикации и лимиты задаются в локальной конфигурации. Для подключения нужны собственное Reddit-приложение с одобренным API-доступом и установленная модель Ollama.
+A local Reddit writing agent built with Node.js. It generates posts and comments with Ollama, keeps a draft queue, and can publish through Reddit's API using OAuth.
 
-По умолчанию агент готовит черновики. Публикация включается явно; автоматический запуск ограничен заданным числом циклов. Перед отправкой проверяются аккаунт, правила сообщества, лимиты и дубли. Если результат запроса неизвестен, агент останавливается до сверки состояния.
+Runs on **Node.js 22+ with no external npm dependencies**. You choose the model, editorial profile, publication targets, and limits in a local configuration file. Reddit-connected features require your own approved Reddit app and API access for your use case.
 
-Статус: прототип. Автоматические тесты проверяют логику на подставных ответах сервисов.
+The default is to prepare drafts. Publishing requires an explicit command, and automated runs have a fixed number of cycles. Before sending, the agent checks the account, community rules, limits, and duplicates. If a submission's outcome is unknown, it stops until the result is reconciled.
 
-## Функционал
+**Status: prototype.** Automated tests use simulated service responses. A live OAuth, model, and publishing flow still needs to be verified with an approved app.
 
-Профиль генерации настраивается в конфигурации; по умолчанию используется `commons`. Модель возвращает предложение поста, комментария или пропуска. Проверку и отправку выполняет приложение.
+## Features
 
-| Задача | Как работает сейчас |
+The default editorial profile is `commons`; you can change it in the configuration. The model proposes a post, comment, or skip. The application validates the proposal and handles publishing.
+
+| Feature | Current behavior |
 | --- | --- |
-| Комментарии | Просматривает последние 10 постов выбранного сообщества. Берёт первый подходящий пост не старше суток, читает до пяти комментариев и предлагает один ответ на пост. Модель может отказаться. |
-| Свои посты | Пишет текст по очередной теме из вашего списка. Цель — разрешённое сообщество или собственный профиль. |
-| Черновики | Сохраняет текст локально. Можно прочитать, опубликовать или отклонить. |
-| Автопубликация | За один цикл готовит и пытается отправить не больше одного материала. Число циклов задаётся при запуске. |
-| Продолжение разговоров | Находит прямые ответы на последние публикации агента. Готовит ответ на выбранный комментарий с контекстом его ветки. |
-| Поиск сообществ | Ищет по названию и описанию через Reddit API. Возвращает кандидатов для добавления в конфигурацию. |
-| Готовые рукописи | Импортирует UTF-8 `.md` и `.txt` в очередь без обработки моделью. Сохраняет текст и добавляет настроенную подпись. |
-| Изображения | Принимает локальные PNG/JPEG до 10 MiB. Загружает файл в Reddit при явной публикации черновика. |
-| Поиск источников | Wikipedia или настроенный SearXNG. Сохраняет результаты и передаёт выбранные источники модели через `--sources`. |
-| Несколько аккаунтов | Запускает от 1 до 8 агентов в отдельных процессах. У каждого свои настройки, OAuth, очередь и лимиты. |
+| Comments | Checks the latest 10 posts in a configured community, selects the first eligible post less than 24 hours old, reads up to five comments, and proposes one reply to the post. The model may decline. |
+| Original posts | Writes about the next topic in your list for an allowed community or your own profile. |
+| Draft queue | Stores text locally for review, publication, or rejection. |
+| Automatic publishing | Prepares and attempts to send at most one item per cycle. You set the cycle count when starting a run. |
+| Conversation follow-ups | Finds direct replies to the agent's recent publications and drafts a reply to a selected comment using its thread context. |
+| Community discovery | Searches community names and descriptions through the Reddit API. Returns candidates without adding them to your configuration. |
+| Manuscript import | Imports UTF-8 `.md` and `.txt` files without model processing. Preserves the text and adds the configured disclosure. |
+| Images | Accepts local PNG/JPEG files up to 10 MiB. Uploads the image when you explicitly publish the draft. |
+| Source search | Searches Wikipedia or a configured SearXNG instance, stores results, and supplies selected sources to the model through `--sources`. |
+| Multiple accounts | Runs 1–8 agents in separate processes, each with its own configuration, OAuth credentials, queue, and limits. |
 
-Команды и примеры: [разговоры, импорт, изображения и источники](docs/workflows.md), [несколько аккаунтов](docs/fleet.md). Новые команды подготовки создают черновики; отправка выполняется через `publish ID`. Поиск источников возвращает ссылки и выдержки из выдачи. Он не читает полные страницы и не проверяет факты автоматически.
+See the [workflow examples](docs/workflows.md) and [multiple-account guide](docs/fleet.md), currently in Russian. Reply, manuscript, and image preparation commands create drafts; use `publish ID` to send them. Source search returns links and search excerpts. It does not read full pages or automatically verify facts.
 
-## Попробовать без аккаунта
+## Try it without an account
 
-Нужен [Node.js 22+](https://nodejs.org/). Скачайте проект через **Code → Download ZIP**, распакуйте и откройте терминал в его папке:
+Install [Node.js 22+](https://nodejs.org/). Download the project with **Code → Download ZIP**, extract it, and open a terminal in the project directory:
 
 ```sh
 npm run demo
 ```
 
-Вы увидите пример черновика на вымышленное обсуждение. Текст примера заранее задан: демонстрация показывает работу очереди, не запускает модель и ничего не отправляет в Reddit. Устанавливать npm-зависимости не требуется.
+This shows a draft for a fictional discussion using a fixed example response. It demonstrates the queue without running a model or contacting Reddit. You do not need to install npm dependencies.
 
-## Проверить голос на своей модели
+## Generate with your own model
 
-Установите Ollama и модель, создайте конфиг и укажите её имя в `ollama.model`:
+Install [Ollama](https://ollama.com/) and download a model that can return JSON. Start Ollama, then create your local configuration:
 
 ```sh
 node bin/cli.js init
-# Укажите установленную модель в agent.config.json
+```
+
+In `agent.config.json`, set `ollama.model` to the exact name of your installed model. Edit `mission`, `voice`, `language`, and `topics` to fit what you want to write. Then run:
+
+```sh
 node bin/cli.js preview
 ```
 
-`preview` пишет пробный пост по первой теме из конфига. Он обращается к настроенному серверу модели, не подключает Reddit, не создаёт очередь и ничего не публикует. Это самый короткий путь проверить, подходит ли вам стиль.
+`preview` generates a sample post about `topics[0]` and prints the result in the terminal. It calls your configured model server, without connecting to Reddit, creating a queued draft, or publishing anything. You can edit the result and manually post it where permitted.
 
-## Подключить свой аккаунт
+This is the available writing workflow without Reddit app registration. It does not read Reddit threads or automatically reply to them.
 
-Для настоящей работы дополнительно нужны:
+## Use with Codex or another coding assistant
 
-- [Ollama](https://ollama.com/) со скачанной моделью, которая умеет возвращать JSON;
-- одобренное Reddit приложение с API-доступом для вашего сценария;
-- допустимость автоматизации в выбранных сообществах.
+You can give a coding assistant this repository URL and ask it to help with setup or writing. It needs permission to read the repository; running the CLI also needs access to a local checkout and terminal. [AGENTS.md](AGENTS.md) provides the workflow and project constraints.
 
-Reddit требует предварительного одобрения API-доступа и регистрации приложения. Поэтому обещать «скачал, ввёл логин и сразу запустил» здесь нельзя. Требования описаны в [Responsible Builder Policy](https://support.reddithelp.com/hc/en-us/articles/42728983564564-Responsible-Builder-Policy).
+A starting request:
 
-Начните с создания локальных настроек:
+> Read README.md and AGENTS.md in https://github.com/dorsem/red-agent. Help me prepare one text for review. Ask for my topic and writing preferences if needed. If I want to run the project, inspect it, try the offline demo, and use an already installed Ollama model for preview when available. Otherwise, draft in this conversation and explain that you have not run the CLI model. Do not connect to Reddit or publish anything.
+
+Drafting in the assistant's conversation uses that assistant's model and account. It does not connect the CLI to Codex or replace its Ollama backend.
+
+Browser control depends on the assistant's environment and permissions. For example, Codex can operate the desktop app's built-in browser, while Codex CLI and the IDE extension do not include that browser ([OpenAI documentation](https://learn.chatgpt.com/docs/browser)). RED AGENT itself has no browser automation backend. Giving an assistant the repository does not provide Reddit authorization or start an unattended bot; browser automation is not a fallback after app registration or access has been refused.
+
+## Can anyone connect their own Reddit account?
+
+The code supports each operator's own approved app and OAuth login. It does not include shared credentials or access through the project author's account. Downloading the code or changing the `permissions` flags does not grant Reddit access.
+
+Reddit requires app registration and explicit approval for API access. If registration or access has been refused, use the local `demo` and `preview` commands. The project cannot promise “download, enter your login, and start posting.” See the [Responsible Builder Policy](https://support.reddithelp.com/hc/en-us/articles/42728983564564-Responsible-Builder-Policy).
+
+**API transition:** Reddit has announced a move from the public Data API to Devvit. This project currently uses the Data API and has no Devvit implementation. See the [transition dates and official references](docs/reddit-policy.md#data-api-transition) before planning a connected deployment.
+
+## Connect an approved app
+
+In addition to Node.js and Ollama, you need an approved Reddit app with API access for your use case and permission for automation in your chosen communities.
+
+1. Run `node bin/cli.js init` if you have not already. It creates `agent.config.json` and `.env` without overwriting existing files. Both are excluded from Git.
+2. Configure your approved app's OAuth redirect URI as `http://127.0.0.1:8765/callback`. The code supports the authorization-code flow for an installed app or a confidential web app with that callback.
+3. Set `REDDIT_CLIENT_ID` and a descriptive `REDDIT_USER_AGENT` in `.env`. Set `REDDIT_CLIENT_SECRET` only for a confidential app. Never enter a Reddit password in these files.
+4. Configure your model and topics. Set `permissions.apiApproved`, `permissions.appRegistered`, and `permissions.accountEligible` to `true` only when each is actually satisfied. These fields record your confirmation; they do not verify Reddit's decision.
+5. Add permitted communities to `communities`, for example `{ "name": "YOUR_COMMUNITY", "automationAllowed": true }`, using the community name without `r/`. Original posts require `actions.posts: true`. For your own profile, also enable `profilePosts: true`; the agent obtains the profile name from OAuth.
+
+Run all commands from the same agent directory:
 
 ```sh
-node bin/cli.js init
+node bin/cli.js auth
+node bin/cli.js doctor
+node bin/cli.js rules YOUR_COMMUNITY
+node bin/cli.js rules YOUR_COMMUNITY --accept
 ```
 
-Затем пройдите [инструкцию подключения](docs/setup.md): заполните параметры приложения, выберите модель и место публикаций, войдите через Reddit и просмотрите правила. Пароль вводится на сайте Reddit; агент получает OAuth-токен.
+`auth` prints a URL to open yourself. Check the account and permissions on Reddit before authorizing. The agent requests `identity`, `read`, and `submit`, listens on `127.0.0.1` for up to five minutes, and stores tokens locally. Your password is entered only on Reddit.
 
-## Настроить манеру письма
+Replace `YOUR_COMMUNITY` with your permitted community, or `@profile` for your own profile. Read the rules before using `--accept`: it records your review and confirmation that automation is allowed. An unavailable rules response stops the agent.
+
+The [detailed setup guide](docs/setup.md) is currently in Russian.
+
+## Adjust the writing style
 
 ```sh
 node bin/cli.js settings
 ```
 
-В терминале появятся переключатели `[x]`: редактура против ИИ-штампов, юмор, особенности голоса и проверка каждого текста перед отправкой. Введите номер, чтобы изменить настройку, затем `s`, чтобы сохранить. Полные параметры описаны в [руководстве](docs/voice.md).
+The terminal presents `[x]` switches for editing repetitive or formulaic language, humor, voice features, and review of every text before sending. Enter a number to toggle an option, then `s` to save. See the [voice guide](docs/voice.md), currently in Russian.
 
-Редактура убирает повторы и пустые фразы; она не маскирует автоматизацию и не гарантирует прохождение модерации. Агент проверяет текущие правила и ограничения, избегает дублей и останавливается при проблемах с доступом. Если модель сомневается в допустимости конкретного текста, он остаётся на проверку. Модель может не заметить нарушение; отсутствие бана не гарантируется.
+Editing does not conceal automation or guarantee acceptance by moderators. The agent checks current rules and limits, avoids duplicates, and stops on access problems. If the model flags a publication risk, the text stays for review. The model can miss violations; these checks cannot guarantee that an account will avoid restrictions.
 
-## Запуск после настройки
+## Run after setup
 
-Подготовить один черновик:
+Prepare one draft:
 
 ```sh
 node bin/cli.js run
 ```
 
-Если найдена подходящая тема и модель подготовила текст, команда покажет его вместе с `id`. Посмотреть очередь и отправить выбранный черновик:
+If there is an eligible topic and the model produces text, the command displays the draft and its `id`. Review the queue and the chosen draft before sending:
 
 ```sh
 node bin/cli.js status
+node bin/cli.js show DRAFT_ID
 node bin/cli.js publish DRAFT_ID
 ```
 
-Замените `DRAFT_ID` на полученный `id`. Для самостоятельной подготовки и публикации:
+Replace `DRAFT_ID` with the returned `id`. To generate and publish automatically for a limited run:
 
 ```sh
 node bin/cli.js run --publish --cycles 3
 ```
 
-Это максимум три цикла, каждый с возможностью одной отправки. По умолчанию между отправками проходит не меньше часа, а за скользящие сутки допускается не больше трёх попыток. Пропуск темы не считается публикацией. При ошибке или невыполненной проверке запуск заканчивается раньше; компьютер и процесс должны оставаться включёнными.
+This runs at most three cycles, each with at most one submission attempt. By default, writes are at least one hour apart, with at most three attempts in a rolling 24-hour period. Skipped topics do not count as publications. Errors or failed checks can stop the run early. The computer and process must remain running.
 
-Текст, который модель отметила как обсуждение личного страдания или текущего кризиса, остаётся черновиком даже с `--publish`: сначала прочитайте его. Это оценка самой модели, она не гарантирует распознавания всех таких случаев.
+Text the model flags as involving personal suffering or an immediate crisis remains a draft even with `--publish`, so you can review it first. This is a model assessment and may miss such cases.
 
-Без `--publish` новые тексты остаются черновиками. Поддерживается от 1 до 20 циклов; бесконечного режима нет. Интервалы и лимиты настраиваются, но не гарантируют отсутствие блокировок.
+Without `--publish`, generated text stays in the draft queue. Runs support 1–20 cycles; there is no infinite mode. Intervals and limits are configurable but do not guarantee continued Reddit access.
 
-## Если нужно остановить
+## Stop publishing
 
 ```sh
 node bin/cli.js halt
 ```
 
-Команда запрещает следующие отправки; уже отправленный запрос отозвать нельзя. Если Reddit не подтвердил результат, агент остановится и не станет повторять публикацию вслепую. Порядок проверки и возобновления описан в [инструкции восстановления](docs/recovery.md).
+This blocks subsequent sends; it cannot recall a request already sent. If Reddit has not confirmed a submission's outcome, the agent stops instead of retrying blindly. See the [recovery guide](docs/recovery.md), currently in Russian, for reconciliation and resuming.
 
-## Где хранятся данные
+## Data and privacy
 
-Настройки, токены и очередь остаются в локальных файлах, исключённых из Git. По умолчанию тексты обрабатывает Ollama на вашем компьютере. Удалённый сервер модели подключается отдельно и получает переданный ему контекст. Подробности хранения — в [документации](docs/recovery.md#данные-и-ограничения).
+Configuration, tokens, and queued drafts stay in local files excluded from Git. Ollama processes text on your computer by default. An explicitly configured remote model server receives the context supplied to it. Tokens are not sent to the model. See the [storage details](docs/recovery.md#данные-и-ограничения), currently in Russian.
 
-## Что проверено
+## Validation
 
-Автоматические тесты проверяют очередь и сбои отправки, контекст ответов, импорт рукописей, загрузку медиа, источники и изоляцию аккаунтов при параллельном запуске. CI запускает их на Linux, macOS и Windows с Node.js 22 и 24. Эти тесты не подтверждают, что конкретное приложение получит доступ к Reddit или что модель напишет хороший ответ.
+Automated tests cover the queue and submission failures, reply context, manuscript import, media uploads, source selection, and account isolation during parallel runs. CI runs on Linux, macOS, and Windows with Node.js 22 and 24. These tests do not establish that Reddit will approve an app or that a model will produce a good reply.
 
 ```sh
 npm test
 ```
 
-Следующая проверка перед обычным использованием — пройти OAuth с одобренным приложением, получить черновик от реальной модели и проверить одну разрешённую публикацию. Пока это не сделано, статус проекта — прототип.
+The remaining live validation is to complete OAuth with an approved app, generate a draft with a real model, and verify one permitted publication. Until then, the project remains a prototype.
 
-[Проверка замысла](docs/product-review.md) · [Подключение](docs/setup.md) · [Восстановление](docs/recovery.md) · [Архитектура](docs/architecture.md) · [Правила Reddit](docs/reddit-policy.md) · [Безопасность](SECURITY.md)
+Further documentation, currently in Russian: [Product review](docs/product-review.md) · [Setup](docs/setup.md) · [Recovery](docs/recovery.md) · [Architecture](docs/architecture.md).
 
-Лицензия MIT.
+In English: [Reddit requirements](docs/reddit-policy.md) · [Security](SECURITY.md).
+
+## License
+
+[MIT](LICENSE).
