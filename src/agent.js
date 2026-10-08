@@ -5,7 +5,8 @@ import { checkAccount, checkCommunity, checkParent, checkClock, checkBudget, rul
 import { generate } from './model.js';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { bytesHash, readManuscript, readImage, validateImported } from './intake.js';
+import { bytesHash, readManuscript, readImage, validateImported, validateTitle } from './intake.js';
+import { disclosureText } from './disclosure.js';
 import { selectSources } from './research.js';
 import { objectHash, checkReplyObject } from './policy.js';
 
@@ -101,8 +102,8 @@ export class Agent {
     const { target, rules, digest } = await this.targetRules(name, me, state);
     if (image ? rules.submissionType === 'self' || rules.about?.allow_images === false : rules.submissionType === 'link') throw new Error('Community does not accept this post type.');
     const input = image ? await readImage(path) : await readManuscript(path);
-    const content = validateImported(title, image ? this.config.disclosure : input.text, this.config);
-    if (image) content.text = this.config.disclosure;
+    const content = image ? { title: validateTitle(title), text: disclosureText(this.config) } : validateImported(title, input.text, this.config);
+    if (image && content.text.length > this.config.limits.maxBodyChars) throw new Error('Image text exceeds maxBodyChars.');
     const item = { kind: 'post', origin: image ? 'image' : 'manuscript', target: name, community: target.name,
       title: content.title, text: content.text, fingerprint: fingerprint(image ? `image ${input.sha256}` : content.body),
       rulesDigest: digest, reviewRequired: true, sourceIds: [], inputHash: input.sha256 };

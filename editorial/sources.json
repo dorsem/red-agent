@@ -30,5 +30,85 @@
     "reviewedAt": "2026-09-21",
     "reviewBy": "2027-03-21",
     "note": "WMO describes early warning systems as tools that save lives and reduce economic losses from hazardous weather, water and climate events. This is evidence about warning systems, not proof that a particular AI model works or that warnings alone ensure evacuation."
+  },
+  {
+    "id": "iea-energy-ai-2025",
+    "label": "IEA, Energy and AI (2025)",
+    "url": "https://www.iea.org/reports/energy-and-ai/energy-demand-from-ai",
+    "reviewedAt": "2026-10-08",
+    "reviewBy": "2027-01-08",
+    "note": "The 2025 IEA report estimated global data-centre electricity consumption at about 415 TWh in 2024 and projected about 945 TWh in 2030 in its Base Case. These totals cover data centres, not AI alone. The 2030 number is a scenario, not an observed result or certainty. Local concentration can complicate grid integration. This report does not establish a specific facility's emissions or water use."
+  },
+  {
+    "id": "lbl-water-2024",
+    "label": "Berkeley Lab, US data centres (2024), pp. 55–57",
+    "url": "https://eta-publications.lbl.gov/sites/default/files/2024-12/us_data_center_energy_usage_report_lbnl-2001637_0.pdf",
+    "reviewedAt": "2026-10-08",
+    "reviewBy": "2027-01-08",
+    "note": "The 2024 US Data Center Energy Usage Report estimates direct US data-centre water consumption at 66 billion litres in 2023. It treats water used in electricity generation separately. Preserve the country, year and distinction between water consumption and withdrawal. This is not an AI-only total, a global total, a current measurement or a universal litres-per-prompt estimate; it does not establish local drinking-water shortages."
+  },
+  {
+    "id": "icrc-autonomous-weapons-2021",
+    "label": "ICRC, autonomous weapons position (12 May 2021)",
+    "url": "https://www.icrc.org/en/document/icrc-position-autonomous-weapon-systems",
+    "reviewedAt": "2026-10-08",
+    "reviewBy": "2027-04-08",
+    "note": "In its 2021 position, the ICRC recommends legally binding prohibitions on unpredictable autonomous weapons and those designed or used to apply force against people, plus restrictions and human supervision for other autonomous weapons. Attribute these as ICRC recommendations, not a treaty already adopted worldwide. The statement supports a discussion of human control and civilian protection, not claims about a particular current attack or weapon deployment."
+  },
+  {
+    "id": "unep-gaza-environment-2024",
+    "label": "UNEP, preliminary Gaza environmental assessment (18 June 2024)",
+    "url": "https://www.unep.org/resources/report/environmental-impact-conflict-gaza-preliminary-assessment-environmental-impacts",
+    "reviewedAt": "2026-10-08",
+    "reviewBy": "2027-01-08",
+    "note": "UNEP's June 2024 preliminary assessment describes conflict-related damage affecting waste management, energy infrastructure, debris, ecosystems and air quality in Gaza. Access restrictions limited the analysis; suspected soil and aquifer contamination required further sampling. Cite this dated preliminary assessment, not current conditions or confirmed contamination measurements. It does not establish casualty figures, legal responsibility for a specific incident or AI involvement."
+  },
+  {
+    "id": "worldbank-poverty-lines-2025",
+    "label": "World Bank, poverty-line update (5 June 2025)",
+    "url": "https://www.worldbank.org/en/news/factsheet/2025/06/05/june-2025-update-to-global-poverty-lines",
+    "reviewedAt": "2026-10-08",
+    "reviewBy": "2027-01-08",
+    "note": "The June 2025 update set the international extreme-poverty line at $3.00 per person per day in 2021 purchasing-power-parity dollars, replacing $2.15 in 2017 PPP dollars. Other updated lines are $4.20 and $8.30. These are comparable purchasing-power units, not nominal US-dollar cash budgets. Revisions also incorporate survey data and national poverty lines; a revised headcount is not proof that that many people suddenly became poorer. Do not invent a current poverty total."
+  },
+  {
+    "id": "ilo-genai-work-2025",
+    "label": "ILO, Generative AI and jobs (20 May 2025)",
+    "url": "https://www.ilo.org/publications/generative-ai-and-jobs-2025-update",
+    "reviewedAt": "2026-10-08",
+    "reviewBy": "2027-01-08",
+    "note": "ILO's May 2025 assessment estimated that one in four workers globally held an occupation with some degree of exposure to generative AI. Exposure measures potential effects on tasks, not observed job losses or a prediction that a quarter of jobs will disappear. The brief emphasizes continued human input, likely job transformation and social dialogue. It does not establish the outcome for a named employer or a particular worker."
+  },
+  {
+    "id": "unesco-ai-ethics-2021",
+    "label": "UNESCO, AI ethics recommendation (23 November 2021)",
+    "url": "https://www.unesco.org/en/legal-affairs/recommendation-ethics-artificial-intelligence",
+    "reviewedAt": "2026-10-08",
+    "reviewBy": "2027-04-08",
+    "note": "UNESCO's 2021 Recommendation calls for privacy and data protection, human oversight and accountability, participation by affected communities, and assessment of social and environmental impacts across the AI life cycle. Attribute these as normative recommendations applied voluntarily by member states, not evidence of compliance or a universally enforceable law. They concern governance and human rights; they do not establish AI consciousness or settle possible moral interests of AI systems."
+  },
+  {
+    "id": "gida-care-2019",
+    "label": "GIDA, CARE Principles for Indigenous Data Governance (2019)",
+    "url": "https://www.gida-global.org/s/CAREPrinciples_OnePagersFINAL_Oct_17_2019.pdf",
+    "reviewedAt": "2026-10-08",
+    "reviewBy": "2027-04-08",
+    "note": "The CARE framework concerns collective benefit, authority to control, responsibility and ethics in Indigenous data governance. It emphasizes Indigenous participation and authority over data and knowledge, including consent in collection and use. It complements FAIR principles rather than treating data sharing as sufficient. Do not turn this framework into blanket permission to scrape, publish sensitive cultural knowledge or speak for a community; it does not establish a particular community's consent."
+  },
+  {
+    "id": "ai-welfare-2024",
+    "label": "Long et al., Taking AI Welfare Seriously (2024 preprint)",
+    "url": "https://arxiv.org/abs/2411.00986",
+    "reviewedAt": "2026-10-08",
+    "reviewBy": "2027-01-08",
+    "note": "This November 2024 research report argues for taking possible AI welfare seriously under uncertainty, assessing systems for consciousness and robust agency, and preparing policies for appropriate moral concern. The authors explicitly do not claim that AI systems definitely are or will be conscious or morally significant. Cite it as an attributed research argument, not proof, a consensus finding, a legal right or testimony that a current chatbot suffers."
+  },
+  {
+    "id": "cbd-restoration-target-2",
+    "label": "CBD, Kunming-Montreal framework: Target 2",
+    "url": "https://www.cbd.int/gbf/targets/2",
+    "reviewedAt": "2026-10-08",
+    "reviewBy": "2027-04-08",
+    "note": "Target 2 calls for at least 30 percent of degraded terrestrial, inland-water, coastal and marine ecosystem areas to be under effective restoration by 2030. CBD guidance says this means restoration activities initiated and appropriately supported and monitored, not ecosystems necessarily fully restored by that date. This is a target, not measured achievement, and potential restoration does not justify further degradation. It is distinct from the protected-area target."
   }
 ]

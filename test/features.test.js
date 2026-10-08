@@ -94,7 +94,7 @@ test('manuscript import preserves Unicode, spacing, URLs and line endings withou
   const path = resolve(x.root, 'my manuscript.md'); await writeFile(path, body);
   x.agent.model = async () => { throw new Error('Model must not run'); };
   const draft = await x.agent.importFile('writing_lab', path, 'Мой заголовок');
-  assert.equal(draft.text, `${body}\n\n---\n${x.config.disclosure}`); assert.equal(draft.origin, 'manuscript'); assert.equal(x.writes(), 0);
+  assert.equal(draft.text, body); assert.equal(draft.origin, 'manuscript'); assert.equal(x.writes(), 0);
   await writeFile(path, 'Changed file after import'); await x.agent.publish(draft.id); assert.equal(x.writes(), 1);
 });
 
@@ -102,7 +102,7 @@ test('imports reject invalid UTF-8, oversized text, wrong extension and disabled
   const x = await fixture(t); const path = resolve(x.root, 'manuscript.txt');
   await writeFile(path, Buffer.from([0xff, 0xff])); await assert.rejects(readManuscript(path), /UTF-8/);
   await writeFile(path, 'a'.repeat(100001)); await assert.rejects(readManuscript(path), /at most/);
-  await writeFile(path, 'a'.repeat(x.config.limits.maxBodyChars)); await assert.rejects(x.agent.importFile('writing_lab', path, 'Title'), /maxBodyChars/);
+  await writeFile(path, 'a'.repeat(x.config.limits.maxBodyChars + 1)); await assert.rejects(x.agent.importFile('writing_lab', path, 'Title'), /maxBodyChars/);
   await assert.rejects(readManuscript(resolve(x.root, '.env')), /md or .txt/);
   x.config.actions.posts = false; await assert.rejects(x.agent.importFile('writing_lab', path, 'Title'), /disabled/);
 });
@@ -110,6 +110,7 @@ test('imports reject invalid UTF-8, oversized text, wrong extension and disabled
 test('image draft snapshots bytes; asset allocation happens only after durable pending intent', async t => {
   const x = await fixture(t); const path = resolve(x.root, 'image.png'); await writeFile(path, png);
   const draft = await x.agent.importFile('writing_lab', path, 'Image caption', true); assert.equal(x.writes(), 0);
+  assert.equal(draft.text, '');
   await writeFile(path, 'Original was replaced');
   x.reddit.upload = async (image, bytes, record) => {
     assert.deepEqual(bytes, png); const stored = (await x.store.read()).items[0]; assert.equal(stored.status, 'pending'); assert.equal(stored.stage, 'asset');
@@ -118,6 +119,26 @@ test('image draft snapshots bytes; asset allocation happens only after durable p
   };
   x.reddit.submit = async item => { assert.equal((await x.store.read()).items[0].stage, 'submit'); assert.equal(item.asset.id, 'asset'); return { name: 't3_image' }; };
   await x.agent.publish(draft.id); assert.equal((await x.store.read()).items[0].status, 'sent');
+});
+
+test('configured disclosure is preserved for manuscripts and image captions', async t => {
+  const x = await fixture(t); x.config.disclosure = 'Automated contribution.';
+  const path = resolve(x.root, 'manuscript.txt'); const body = '  A short manuscript.\r\n';
+  await writeFile(path, body);
+  const draft = await x.agent.importFile('writing_lab', path, 'Manuscript');
+  assert.equal(draft.text, `${body}\n\n---\nAutomated contribution.`);
+  const imagePath = resolve(x.root, 'image.png'); await writeFile(imagePath, png);
+  const image = await x.agent.importFile('writing_lab', imagePath, 'Image', true);
+  assert.equal(image.text, 'Automated contribution.');
+  assert.equal(x.writes(), 0);
+});
+
+test('image title and caption limits remain enforced without a manuscript body', async t => {
+  const x = await fixture(t); const path = resolve(x.root, 'image.png'); await writeFile(path, png);
+  await assert.rejects(x.agent.importFile('writing_lab', path, '', true), /title/);
+  x.config.disclosure = 'a'.repeat(x.config.limits.maxBodyChars + 1);
+  await assert.rejects(x.agent.importFile('writing_lab', path, 'Image', true), /maxBodyChars/);
+  assert.equal((await x.store.read()).items.length, 0); assert.equal(x.writes(), 0);
 });
 
 test('media upload failure is not a post; lost submit response is unresolved and never retried', async t => {

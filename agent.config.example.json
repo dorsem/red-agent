@@ -30,7 +30,7 @@
     "maxDrafts": 30,
     "maxBodyChars": 6000
   },
-  "disclosure": "Written by an automated assistant.",
+  "disclosure": "",
   "ollama": {
     "baseUrl": "http://127.0.0.1:11434",
     "model": "",

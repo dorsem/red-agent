@@ -32,9 +32,10 @@ export function validateConfig(c) {
   for (const [group, keys] of [['writing', ['antiSlop', 'humor', 'philosophy']], ['safety', ['reviewAll']]]) {
     for (const key of keys) if (c[group]?.[key] !== undefined && typeof c[group][key] !== 'boolean') throw new Error(`Config: ${group}.${key} must be boolean.`);
   }
-  for (const k of ['mission', 'voice', 'language', 'disclosure']) {
+  for (const k of ['mission', 'voice', 'language']) {
     if (typeof c[k] !== 'string' || !c[k].trim()) throw new Error(`Config: ${k} must be a nonempty string.`);
   }
+  if (c.disclosure !== undefined && typeof c.disclosure !== 'string') throw new Error('Config: disclosure must be a string when supplied.');
   if (!Array.isArray(c.topics) || !c.topics.length || c.topics.some(x => typeof x !== 'string' || !x.trim())) throw new Error('Config: provide topics.');
   if (!Array.isArray(c.communities)) throw new Error('Config: communities must be an array.');
   const names = new Set();

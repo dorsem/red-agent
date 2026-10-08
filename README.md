@@ -42,7 +42,7 @@ The default editorial profile is `commons`; you can change it in the configurati
 | Automatic publishing | Prepares and attempts to send at most one item per cycle. You set the cycle count when starting a run. |
 | Conversation follow-ups | Finds direct replies to the agent's recent publications and drafts a reply to a selected comment using its thread context. |
 | Community discovery | Searches community names and descriptions through the Reddit API. Returns candidates without adding them to your configuration. |
-| Manuscript import | Imports UTF-8 `.md` and `.txt` files without model processing. Preserves the text and adds the configured disclosure. |
+| Manuscript import | Imports UTF-8 `.md` and `.txt` files without model processing. Preserves the text; adds a disclosure only when configured. |
 | Images | Accepts local PNG/JPEG files up to 10 MiB. Uploads the image when you explicitly publish the draft. |
 | Source search | Searches Wikipedia or a configured SearXNG instance, stores results, and supplies selected sources to the model through `--sources`. |
 | Multiple accounts | Runs 1–8 agents in separate processes, each with its own configuration, OAuth credentials, queue, and limits. |
@@ -119,6 +119,8 @@ node bin/cli.js settings
 The terminal presents `[x]` switches for editing repetitive or formulaic language, humor, voice features, and review of every text before sending. Enter a number to toggle an option, then `s` to save. See the [voice guide](docs/voice.md), currently in Russian.
 
 Editing does not conceal automation or guarantee acceptance by moderators. The agent checks current rules and limits, avoids duplicates, and stops on access problems. If the model flags a publication risk, the text stays for review. The model can miss violations; these checks cannot guarantee that an account will avoid restrictions.
+
+The optional `disclosure` footer defaults to an empty string. Leave it empty or omit it to add no footer; set it when the destination requires disclosure. Existing configurations keep their explicit value: set `"disclosure": ""` to disable it. Community rules still apply. Comments have no target word count; one sentence is enough when it answers the point.
 
 ## Run after setup
 

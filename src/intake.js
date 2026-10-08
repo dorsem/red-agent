@@ -1,6 +1,7 @@
 import { open } from 'node:fs/promises';
 import { extname } from 'node:path';
 import { createHash } from 'node:crypto';
+import { disclosureFooter } from './disclosure.js';
 
 export const bytesHash = bytes => createHash('sha256').update(bytes).digest('hex');
 
@@ -39,10 +40,15 @@ export async function readImage(path) {
   return { bytes, sha256: bytesHash(bytes), mime: png ? 'image/png' : 'image/jpeg', extension: png ? 'png' : 'jpg' };
 }
 
-export function validateImported(title, body, config) {
+export function validateTitle(title) {
   if (typeof title !== 'string' || !title.trim() || title.length > 300 || /[\r\n\0]/.test(title)) throw new Error('A single-line title of 1–300 characters is required.');
+  return title;
+}
+
+export function validateImported(title, body, config) {
+  validateTitle(title);
   if (typeof body !== 'string' || !body.trim() || body.includes('\0')) throw new Error('Manuscript is empty or invalid.');
-  const text = `${body}\n\n---\n${config.disclosure}`;
+  const text = body + disclosureFooter(config);
   if (text.length > config.limits.maxBodyChars) throw new Error('Imported text including disclosure exceeds maxBodyChars; split the manuscript explicitly.');
   return { title, text, body };
 }
